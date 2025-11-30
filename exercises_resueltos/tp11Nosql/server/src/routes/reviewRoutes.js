@@ -98,4 +98,18 @@ router.put('/:id', protect, async (req, res) => {
     }
 });
 
+// @desc    Get user reviews
+// @route   GET /api/reviews/user/me
+// @access  Private
+router.get('/user/me', protect, async (req, res) => {
+    try {
+        const reviews = await Review.find({ user: req.user._id }).sort({
+            createdAt: -1,
+        });
+        res.json(reviews);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 export default router;

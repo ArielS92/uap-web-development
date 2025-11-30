@@ -5,26 +5,34 @@ import { Link } from 'react-router-dom';
 const Profile = () => {
     const { user, logout } = useAuth();
     const [favorites, setFavorites] = useState([]);
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-        const fetchFavorites = async () => {
+        const fetchData = async () => {
             if (!user) return;
             try {
-                const response = await fetch('/api/favorites', {
-                    headers: {
-                        Authorization: `Bearer ${user.token}`,
-                    },
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setFavorites(data);
+                const token = user.token;
+                const headers = { Authorization: `Bearer ${token}` };
+
+                // Fetch Favorites
+                const favRes = await fetch('/api/favorites', { headers });
+                if (favRes.ok) {
+                    const favData = await favRes.json();
+                    setFavorites(favData);
+                }
+
+                // Fetch Reviews
+                const reviewRes = await fetch('/api/reviews/user/me', { headers });
+                if (reviewRes.ok) {
+                    const reviewData = await reviewRes.json();
+                    setReviews(reviewData);
                 }
             } catch (error) {
-                console.error('Failed to fetch favorites:', error);
+                console.error('Failed to fetch profile data:', error);
             }
         };
 
-        fetchFavorites();
+        fetchData();
     }, [user]);
 
     if (!user) {
@@ -50,6 +58,26 @@ const Profile = () => {
                                     <img src={fav.cover || 'https://via.placeholder.com/128x192'} alt={fav.title} />
                                     <h3>{fav.title}</h3>
                                 </Link>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="reviews-section">
+                <h2>My Reviews</h2>
+                {reviews.length === 0 ? (
+                    <p>No reviews yet.</p>
+                ) : (
+                    <div className="reviews-list">
+                        {reviews.map((review) => (
+                            <div key={review._id} className="review-card">
+                                <Link to={`/book/${review.bookId}`}>
+                                    <h4>Book ID: {review.bookId}</h4>
+                                </Link>
+                                <div className="rating">Rating: {review.rating}/5</div>
+                                <p>{review.content}</p>
+                                <small>{new Date(review.createdAt).toLocaleDateString()}</small>
                             </div>
                         ))}
                     </div>
@@ -95,6 +123,24 @@ const Profile = () => {
           font-size: 1rem;
           margin-top: 0.5rem;
           color: #333;
+        }
+        .reviews-section {
+            margin-top: 3rem;
+        }
+        .review-card {
+            background: #f9f9f9;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .review-card h4 {
+            margin: 0 0 0.5rem 0;
+        }
+        .review-card .rating {
+            color: #f59e0b;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
         }
       `}</style>
         </div>

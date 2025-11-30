@@ -76,4 +76,15 @@ describe('Review Routes', () => {
 
         expect(res.statusCode).toEqual(401);
     });
+
+    it('should get reviews for the authenticated user', async () => {
+        const res = await request(app)
+            .get('/api/reviews/user/me')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(Array.isArray(res.body)).toBeTruthy();
+        expect(res.body.length).toBeGreaterThan(0);
+        expect(res.body[0].user).toEqual(userId.toString());
+    });
 });
