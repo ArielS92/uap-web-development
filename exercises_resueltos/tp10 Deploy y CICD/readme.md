@@ -2,6 +2,9 @@
 
 A platform for discovering books, reading reviews, and community voting. Built with React and Vite.
 
+## 🌐 Live Demo
+[https://book-discovery.vercel.app/](https://book-discovery.vercel.app/)
+
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
